@@ -1,4 +1,4 @@
-package io.neson.react.notification;
+package io.neson.ReactNative.notification;
 
 import android.os.Build;
 import android.os.SystemClock;
@@ -17,9 +17,9 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-import io.neson.react.notification.NotificationAttributes;
-import io.neson.react.notification.NotificationEventReceiver;
-import io.neson.react.notification.NotificationPublisher;
+import io.neson.ReactNative.notification.NotificationAttributes;
+import io.neson.ReactNative.notification.NotificationEventReceiver;
+import io.neson.ReactNative.notification.NotificationPublisher;
 
 import android.util.Log;
 import android.graphics.Color;
@@ -331,7 +331,7 @@ public class Notification {
     }
 
     private SharedPreferences getSharedPreferences () {
-        return (SharedPreferences) context.getSharedPreferences(io.neson.react.notification.NotificationManager.PREFERENCES_KEY, Context.MODE_PRIVATE);
+        return (SharedPreferences) context.getSharedPreferences(io.neson.ReactNative.notification.NotificationManager.PREFERENCES_KEY, Context.MODE_PRIVATE);
     }
 
     private PendingIntent getContentIntent() {

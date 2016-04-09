@@ -1,4 +1,4 @@
-package io.neson.react.notification;
+package io.neson.ReactNative.notification;
 
 import android.os.Bundle;
 import android.content.Context;
@@ -20,10 +20,10 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 
-import io.neson.react.notification.NotificationManager;
-import io.neson.react.notification.Notification;
-import io.neson.react.notification.NotificationAttributes;
-import io.neson.react.notification.NotificationEventReceiver;
+import io.neson.ReactNative.notification.NotificationManager;
+import io.neson.ReactNative.notification.Notification;
+import io.neson.ReactNative.notification.NotificationAttributes;
+import io.neson.ReactNative.notification.NotificationEventReceiver;
 
 import java.util.ArrayList;
 import java.util.Set;

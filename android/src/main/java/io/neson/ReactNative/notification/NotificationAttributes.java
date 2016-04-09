@@ -1,4 +1,4 @@
-package io.neson.react.notification;
+package io.neson.ReactNative.notification;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;

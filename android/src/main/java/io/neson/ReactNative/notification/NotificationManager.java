@@ -1,10 +1,10 @@
-package io.neson.react.notification;
+package io.neson.ReactNative.notification;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import io.neson.react.notification.Notification;
-import io.neson.react.notification.NotificationAttributes;
+import io.neson.ReactNative.notification.Notification;
+import io.neson.ReactNative.notification.NotificationAttributes;
 
 import java.util.ArrayList;
 import java.util.Set;

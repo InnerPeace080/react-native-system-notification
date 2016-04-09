@@ -1,4 +1,4 @@
-package io.neson.react.notification;
+package io.neson.ReactNative.notification;
 
 import android.content.ComponentName;
 import android.os.Build;
