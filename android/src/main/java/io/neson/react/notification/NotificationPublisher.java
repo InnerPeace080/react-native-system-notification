@@ -1,4 +1,4 @@
-package io.neson.ReactNative.notification;
+package io.neson.react.notification;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,8 +7,8 @@ import android.content.Intent;
 import java.lang.System;
 import java.util.Calendar;
 
-import io.neson.ReactNative.notification.Notification;
-import io.neson.ReactNative.notification.NotificationManager;
+import io.neson.react.notification.Notification;
+import io.neson.react.notification.NotificationManager;
 
 import android.util.Log;
 

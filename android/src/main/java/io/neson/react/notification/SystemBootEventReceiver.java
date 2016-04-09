@@ -1,4 +1,4 @@
-package io.neson.ReactNative.notification;
+package io.neson.react.notification;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,8 +7,8 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 
-import io.neson.ReactNative.notification.NotificationManager;
-import io.neson.ReactNative.notification.Notification;
+import io.neson.react.notification.NotificationManager;
+import io.neson.react.notification.Notification;
 
 import android.util.Log;
 

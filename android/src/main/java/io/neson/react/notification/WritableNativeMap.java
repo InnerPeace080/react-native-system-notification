@@ -1,4 +1,4 @@
-package io.neson.ReactNative.notification;
+package io.neson.react.notification;
 
 import java.util.HashMap;
 import com.facebook.react.bridge.ReadableArray;
