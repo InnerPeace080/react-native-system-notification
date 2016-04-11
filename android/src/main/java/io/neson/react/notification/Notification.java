@@ -1,28 +1,21 @@
 package io.neson.react.notification;
 
-import android.os.Build;
-import android.os.SystemClock;
-import android.app.PendingIntent;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
-import android.support.v4.app.NotificationCompat;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
-
-import java.lang.System;
-import java.util.HashMap;
-import java.util.Map;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
-import io.neson.react.notification.NotificationAttributes;
-import io.neson.react.notification.NotificationEventReceiver;
-import io.neson.react.notification.NotificationPublisher;
-
-import android.util.Log;
-import android.graphics.Color;
+import java.util.Random;
 
 /**
  * An object-oriented Wrapper class around the system notification class.
@@ -32,15 +25,18 @@ import android.graphics.Color;
  */
 public class Notification {
     private Context context;
-    private int id;
+    private String id;
+    private int subId;
     private NotificationAttributes attributes;
 
     /**
      * Constructor.
      */
-    public Notification(Context context, int id, @Nullable NotificationAttributes attributes) {
+    public Notification(Context context, String id, @Nullable NotificationAttributes attributes) {
         this.context = context;
         this.id = id;
+        Random rand = new Random();
+        this.subId = rand.nextInt();
         this.attributes = attributes;
     }
 
@@ -84,7 +80,7 @@ public class Notification {
      * Clear the notification from the status bar.
      */
     public Notification clear() {
-        getSysNotificationManager().cancel(id);
+        getSysNotificationManager().cancel(subId);
 
         Log.i("ReactSystemNotification", "Notification Cleared: " + id);
 
@@ -95,7 +91,7 @@ public class Notification {
      * Cancel the notification.
      */
     public Notification delete() {
-        getSysNotificationManager().cancel(id);
+        getSysNotificationManager().cancel(subId);
 
         if (attributes.delayed || attributes.scheduled) {
             cancelAlarm();
@@ -191,7 +187,7 @@ public class Notification {
      * Show the notification now.
      */
     public void show() {
-        getSysNotificationManager().notify(id, build());
+        getSysNotificationManager().notify(0, build());
 
         Log.i("ReactSystemNotification", "Notification Show: " + id);
     }
@@ -290,7 +286,7 @@ public class Notification {
 
         String attributesJSONString = new Gson().toJson(attributes);
 
-        editor.putString(Integer.toString(id), attributesJSONString);
+        editor.putString(id, attributesJSONString);
 
         if (Build.VERSION.SDK_INT < 9) {
             editor.commit();
@@ -302,7 +298,7 @@ public class Notification {
     }
 
     public void loadAttributesFromPreferences() {
-        String attributesJSONString = getSharedPreferences().getString(Integer.toString(id), null);
+        String attributesJSONString = getSharedPreferences().getString(id, null);
         this.attributes = (NotificationAttributes) new Gson().fromJson(attributesJSONString, NotificationAttributes.class);
 
         Log.i("ReactSystemNotification", "Notification Loaded From Pref: " + id + ": " + attributesJSONString);
@@ -311,7 +307,7 @@ public class Notification {
     public void deleteFromPreferences() {
         SharedPreferences.Editor editor = getSharedPreferences().edit();
 
-        editor.remove(Integer.toString(id));
+        editor.remove(id);
 
         if (Build.VERSION.SDK_INT < 9) {
             editor.commit();
@@ -341,14 +337,14 @@ public class Notification {
         intent.putExtra(NotificationEventReceiver.ACTION, attributes.action);
         intent.putExtra(NotificationEventReceiver.PAYLOAD, attributes.payload);
 
-        return PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(context, subId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getScheduleNotificationIntent() {
         Intent notificationIntent = new Intent(context, NotificationPublisher.class);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, id);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, subId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         return pendingIntent;
     }

@@ -3,14 +3,9 @@ package io.neson.react.notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
-import java.lang.System;
-import java.util.Calendar;
-
-import io.neson.react.notification.Notification;
-import io.neson.react.notification.NotificationManager;
-
 import android.util.Log;
+
+import java.util.Calendar;
 
 /**
  * Publisher for scheduled notifications.
@@ -21,7 +16,7 @@ public class NotificationPublisher extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int id = intent.getIntExtra(NOTIFICATION_ID, 0);
+        String id = intent.getStringExtra(NOTIFICATION_ID);
         long currentTime = System.currentTimeMillis();
         Log.i("ReactSystemNotification", "NotificationPublisher: Prepare To Publish: " + id + ", Now Time: " + currentTime);
 

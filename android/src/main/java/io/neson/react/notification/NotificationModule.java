@@ -1,36 +1,26 @@
 package io.neson.react.notification;
 
-import android.os.Bundle;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
-import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
 
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
-
-import io.neson.react.notification.NotificationManager;
-import io.neson.react.notification.Notification;
-import io.neson.react.notification.NotificationAttributes;
-import io.neson.react.notification.NotificationEventReceiver;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.Map;
-
-import android.util.Log;
 
 /**
  * The main React native module.
@@ -66,7 +56,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rCreate(
-        Integer notificationID,
+        String notificationID,
         ReadableMap notificationAttributes,
         Callback errorCallback,
         Callback successCallback
@@ -92,11 +82,11 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         Callback successCallback
     ) {
         try {
-            ArrayList<Integer> ids = mNotificationManager.getIDs();
+            ArrayList<String> ids = mNotificationManager.getIDs();
             WritableArray rids = new WritableNativeArray();
 
-            for (Integer id: ids) {
-                rids.pushInt(id);
+            for (String id: ids) {
+                rids.pushString(id);
             }
 
             successCallback.invoke((ReadableArray) rids);
@@ -112,7 +102,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rFind(
-        Integer notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -131,7 +121,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rDelete(
-        int notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -155,9 +145,9 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         Callback successCallback
     ) {
         try {
-            ArrayList<Integer> ids = mNotificationManager.getIDs();
+            ArrayList<String> ids = mNotificationManager.getIDs();
 
-            for (Integer id: ids) {
+            for (String id: ids) {
                 try {
                     mNotificationManager.delete(id);
                 } catch (Exception e) {
@@ -178,7 +168,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rClear(
-        int notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -251,7 +241,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         Bundle extras = intent.getExtras();
 
         if (extras != null) {
-            Integer initialSysNotificationId = extras.getInt("initialSysNotificationId");
+            String initialSysNotificationId = extras.getString("initialSysNotificationId");
             if (initialSysNotificationId != null) {
                 cb.invoke(initialSysNotificationId, extras.getString("initialSysNotificationAction"), extras.getString("initialSysNotificationPayload"));
                 return;

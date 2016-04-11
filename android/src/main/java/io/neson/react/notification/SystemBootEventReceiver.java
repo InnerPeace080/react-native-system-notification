@@ -4,13 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import java.util.ArrayList;
-
-import io.neson.react.notification.NotificationManager;
-import io.neson.react.notification.Notification;
-
-import android.util.Log;
 
 /**
  * Set alarms for scheduled notification after system reboot.
@@ -25,9 +21,9 @@ public class SystemBootEventReceiver extends BroadcastReceiver {
             NotificationManager notificationManager = new NotificationManager(context);
             SharedPreferences sharedPreferences = context.getSharedPreferences(NotificationManager.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
-            ArrayList<Integer> ids = notificationManager.getIDs();
+            ArrayList<String> ids = notificationManager.getIDs();
 
-            for (Integer id: ids) {
+            for (String id: ids) {
                 try {
                     Notification notification = notificationManager.find(id);
 

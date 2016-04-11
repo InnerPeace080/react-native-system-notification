@@ -1,18 +1,16 @@
 package io.neson.react.notification;
 
-import android.content.ComponentName;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.SystemClock;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.content.Intent;
-import android.content.Context;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
 
 import java.util.List;
-
-import android.util.Log;
 
 /**
  * Handles user's interaction on notifications.
@@ -28,7 +26,7 @@ public class NotificationEventReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
 
-        Log.i("ReactSystemNotification", "NotificationEventReceiver: Recived: " + extras.getString(ACTION) + ", Notification ID: " + extras.getInt(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
+        Log.i("ReactSystemNotification", "NotificationEventReceiver: Recived: " + extras.getString(ACTION) + ", Notification ID: " + extras.getString(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
 
         // If the application is not running or is not in foreground, start it with the notification
         // passed in
@@ -36,7 +34,7 @@ public class NotificationEventReceiver extends BroadcastReceiver {
             String packageName = context.getApplicationContext().getPackageName();
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
 
-            launchIntent.putExtra("initialSysNotificationId", extras.getInt(NOTIFICATION_ID));
+            launchIntent.putExtra("initialSysNotificationId", extras.getString(NOTIFICATION_ID));
             launchIntent.putExtra("initialSysNotificationAction", extras.getString(ACTION));
             launchIntent.putExtra("initialSysNotificationPayload", extras.getString(PAYLOAD));
             launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -51,7 +49,7 @@ public class NotificationEventReceiver extends BroadcastReceiver {
     private void sendBroadcast(Context context, Bundle extras) {
       Intent brodcastIntent = new Intent("NotificationEvent");
 
-      brodcastIntent.putExtra("id", extras.getInt(NOTIFICATION_ID));
+      brodcastIntent.putExtra("id", extras.getString(NOTIFICATION_ID));
       brodcastIntent.putExtra("action", extras.getString(ACTION));
       brodcastIntent.putExtra("payload", extras.getString(PAYLOAD));
 
