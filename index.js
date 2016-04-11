@@ -71,7 +71,7 @@ var Notification = {
         DeviceEventEmitter.addListener('sysNotificationClick', listener);
 
         NotificationModule.getInitialSysNotification(function(initialSysNotificationId,
-                                                              initialSysNotificationAction, 
+                                                              initialSysNotificationAction,
                                                               initialSysNotificationPayload) {
           if (initialSysNotificationId) {
             var event = {
@@ -80,11 +80,11 @@ var Notification = {
             }
 
             listener(event);
-            
+
             NotificationModule.removeInitialSysNotification();
           }
         });
-        
+
         break;
     }
   },
@@ -99,7 +99,7 @@ function encodeNativeNotification(attributes) {
   if (typeof attributes === 'string') attributes = JSON.parse(attributes);
   // Set defaults
   if (!attributes.smallIcon) attributes.smallIcon = 'ic_launcher';
-  if (!attributes.id) attributes.id = parseInt(Math.random() * 100000);
+  if (!attributes.id) attributes.id = String.toString(parseInt(Math.random() * 100000));
   if (!attributes.action) attributes.action = 'DEFAULT';
   if (!attributes.payload) attributes.payload = {};
   if (attributes.autoClear === undefined) attributes.autoClear = true;
