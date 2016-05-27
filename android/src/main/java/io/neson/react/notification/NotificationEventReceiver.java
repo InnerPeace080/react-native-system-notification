@@ -26,24 +26,32 @@ public class NotificationEventReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle extras = intent.getExtras();
 
-        Log.i("ReactSystemNotification", "NotificationEventReceiver: Recived: " + extras.getString(ACTION) + ", Notification ID: " + extras.getString(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
+        Log.i("ReactSystemNotification", "NotificationEventReceiver: Received: " + extras.getString(ACTION) + ", Notification ID: " + extras.getString(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
 
         // If the application is not running or is not in foreground, start it with the notification
         // passed in
-        if (!applicationIsRunning(context)) {
+//        if (!applicationIsRunning(context)) {
+//            String packageName = context.getApplicationContext().getPackageName();
+//            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+//
+//            launchIntent.putExtra("initialSysNotificationId", extras.getString(NOTIFICATION_ID));
+//            launchIntent.putExtra("initialSysNotificationAction", extras.getString(ACTION));
+//            launchIntent.putExtra("initialSysNotificationPayload", extras.getString(PAYLOAD));
+//            launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//            context.startActivity(launchIntent);
+//            Log.i("ReactSystemNotification", "NotificationEventReceiver: FLAG_ACTIVITY_CLEAR_TOP : Launching: " + packageName);
+//        } else {
             String packageName = context.getApplicationContext().getPackageName();
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-
             launchIntent.putExtra("initialSysNotificationId", extras.getString(NOTIFICATION_ID));
             launchIntent.putExtra("initialSysNotificationAction", extras.getString(ACTION));
             launchIntent.putExtra("initialSysNotificationPayload", extras.getString(PAYLOAD));
-            launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
+            launchIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             context.startActivity(launchIntent);
-            Log.i("ReactSystemNotification", "NotificationEventReceiver: Launching: " + packageName);
-        } else {
+            Log.i("ReactSystemNotification", "NotificationEventReceiver: FLAG_ACTIVITY_SINGLE_TOP :  Launching: " + packageName);
             sendBroadcast(context, extras); // If the application is already running in foreground, send a brodcast too
-        }
+//        }
     }
 
     private void sendBroadcast(Context context, Bundle extras) {
@@ -54,7 +62,7 @@ public class NotificationEventReceiver extends BroadcastReceiver {
       brodcastIntent.putExtra("payload", extras.getString(PAYLOAD));
 
       context.sendBroadcast(brodcastIntent);
-      Log.v("ReactSystemNotification", "NotificationEventReceiver: Broadcast Sent: NotificationEvent: " + extras.getString(ACTION) + ", Notification ID: " + extras.getInt(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
+      Log.v("ReactSystemNotification", "NotificationEventReceiver: Broadcast Sent: NotificationEvent: " + extras.getString(ACTION) + ", Notification ID: " + extras.getString(NOTIFICATION_ID) + ", payload: " + extras.getString(PAYLOAD));
     }
 
     private boolean applicationIsRunning(Context context) {
@@ -65,6 +73,8 @@ public class NotificationEventReceiver extends BroadcastReceiver {
             for (ActivityManager.RunningAppProcessInfo processInfo : processInfos) {
                 if (processInfo.processName.equals(context.getApplicationContext().getPackageName())) {
                     if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+//                            || processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_SERVICE
+//                             || processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
                         for (String d: processInfo.pkgList) {
                             Log.v("ReactSystemNotification", "NotificationEventReceiver: ok: " + d);
                             return true;

@@ -280,7 +280,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
                 Bundle extras = intent.getExtras();
 
                 WritableMap params = Arguments.createMap();
-                params.putInt("notificationID", extras.getInt(NotificationEventReceiver.NOTIFICATION_ID));
+                params.putString("notificationID", extras.getString(NotificationEventReceiver.NOTIFICATION_ID));
                 params.putString("action", extras.getString(NotificationEventReceiver.ACTION));
                 params.putString("payload", extras.getString(NotificationEventReceiver.PAYLOAD));
 
