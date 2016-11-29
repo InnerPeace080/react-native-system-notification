@@ -109,6 +109,17 @@ public class NotificationModule extends ReactContextBaseJavaModule {
             Log.e("ReactSystemNotification", "NotificationModule: create wakeup Error: " + Log.getStackTraceString(e));
         }
     }
+    
+    @ReactMethod
+    public void stopService() {
+        if (mIntent != null) {
+            new android.os.Handler().postDelayed(new Runnable() {
+                public void run() {
+                    getReactApplicationContext().stopService(mIntent);
+                }
+            }, 1000);
+        }
+    }
 
     /**
      * React method to create or update a notification.
