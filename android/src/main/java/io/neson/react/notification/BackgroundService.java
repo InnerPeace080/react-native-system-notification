@@ -34,7 +34,7 @@ public class BackgroundService extends Service {
                 .setBundleAssetName("index.android.bundle")
                 .setJSMainModuleName("index.android")
                 .addPackage(new MainReactPackage())
-                .addPackage(new NotificationPackage(null,intent))
+                .addPackage(new NotificationPackage(intent))
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .setUseOldBridge(true)
