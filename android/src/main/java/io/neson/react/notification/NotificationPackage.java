@@ -1,6 +1,7 @@
 package io.neson.react.notification;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -17,7 +18,12 @@ import java.util.List;
  * The React package.
  */
 public class NotificationPackage implements ReactPackage {
+    private Intent mIntent = null;
     public NotificationPackage() {
+    }
+
+    public NotificationPackage(Intent intent) {
+        mIntent = intent;
     }
 
     @Override
@@ -25,7 +31,7 @@ public class NotificationPackage implements ReactPackage {
             ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
 
-        modules.add(new NotificationModule(reactContext));
+        modules.add(new NotificationModule(reactContext,mIntent));
         return modules;
     }
 

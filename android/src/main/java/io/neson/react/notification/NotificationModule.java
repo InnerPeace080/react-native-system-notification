@@ -41,7 +41,9 @@ import android.util.Log;
 public class NotificationModule extends ReactContextBaseJavaModule {
     final static String PREFERENCES_KEY = "ReactNativeSystemNotification";
     public Context mContext = null;
+    private Intent mIntent;
     public NotificationManager mNotificationManager = null;
+    public WakeupManager mWakeupManager = null;
 
     @Override
     public String getName() {
@@ -51,13 +53,61 @@ public class NotificationModule extends ReactContextBaseJavaModule {
     /**
      * Constructor.
      */
-    public NotificationModule(ReactApplicationContext reactContext) {
+    public NotificationModule(ReactApplicationContext reactContext,Intent intent) {
         super(reactContext);
 
         this.mContext = reactContext;
+        mIntent = intent;
         this.mNotificationManager = (NotificationManager) new NotificationManager(reactContext);
+        this.mWakeupManager = (WakeupManager) new WakeupManager(reactContext);
 
         listenNotificationEvent();
+    }
+
+    @Override
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> constants = new HashMap<>();
+        if (mIntent != null) {
+            String wakeupId = mIntent.getStringExtra("wakeupId");
+            Log.d("ReactSystemNotification", wakeupId);
+            WakeupManager wakeupManager = new WakeupManager(mContext);
+            Wakeup wakeup = wakeupManager.find(wakeupId);
+            Log.d("ReactSystemNotification", wakeup.toString());
+
+            String wakeupAttr ="";
+            if (wakeup.getAttributes() != null) {
+
+                try {
+                    wakeupAttr = ReactNativeJson.convertMapToJson(wakeup.getAttributes().asReadableMap()).toString();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            constants.put("launchWakeup", wakeupAttr);
+        }
+        return constants;
+    }
+
+    /**
+     * React method to create a wakeup
+     */
+    @ReactMethod
+    public void createWakeup(
+        String scheduleID,
+        ReadableMap wakeupAttributes,
+        Callback errorCallback,
+        Callback successCallback
+    ){
+        try {
+            WakeupAttributes a = getWakeupAttributesFromReadableMap(wakeupAttributes);
+            Wakeup n = mWakeupManager.createOrUpdate(scheduleID, a);
+
+            successCallback.invoke(n.getAttributes().asReadableMap());
+
+        } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
+            Log.e("ReactSystemNotification", "NotificationModule: create wakeup Error: " + Log.getStackTraceString(e));
+        }
     }
 
     /**
@@ -65,7 +115,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rCreate(
-        Integer notificationID,
+        String notificationID,
         ReadableMap notificationAttributes,
         Callback errorCallback,
         Callback successCallback
@@ -91,11 +141,11 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         Callback successCallback
     ) {
         try {
-            ArrayList<Integer> ids = mNotificationManager.getIDs();
+            ArrayList<String> ids = mNotificationManager.getIDs();
             WritableArray rids = new WritableNativeArray();
 
-            for (Integer id: ids) {
-                rids.pushInt(id);
+            for (String id: ids) {
+                rids.pushString(id);
             }
 
             successCallback.invoke((ReadableArray) rids);
@@ -111,7 +161,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rFind(
-        Integer notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -126,11 +176,31 @@ public class NotificationModule extends ReactContextBaseJavaModule {
     }
 
     /**
+     * React method to delete (i.e. cancel a wakeup) wakeup.
+     */
+    @ReactMethod
+    public void deleteWakeup(
+            String wakeupID,
+            Callback errorCallback,
+            Callback successCallback
+    ) {
+        try {
+            Wakeup n = mWakeupManager.delete(wakeupID);
+
+            successCallback.invoke(n.getAttributes().asReadableMap());
+
+        } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
+            Log.e("ReactSystemNotification", "NotificationModule: deleteWakeup Error: " + Log.getStackTraceString(e));
+        }
+    }
+
+    /**
      * React method to delete (i.e. cancel a scheduled) notification.
      */
     @ReactMethod
     public void rDelete(
-        int notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -149,14 +219,41 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      * React method to delete (i.e. cancel a scheduled) notification.
      */
     @ReactMethod
+    public void deleteAllWakeup(
+            Callback errorCallback,
+            Callback successCallback
+    ) {
+        try {
+            ArrayList<String> ids = mWakeupManager.getIDs();
+
+            for (String id: ids) {
+                try {
+                    mWakeupManager.delete(id);
+                } catch (Exception e) {
+                    Log.e("ReactSystemNotification", "NotificationModule: deleteAllWakeup Error: " + Log.getStackTraceString(e));
+                }
+            }
+
+            successCallback.invoke();
+
+        } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
+            Log.e("ReactSystemNotification", "NotificationModule: deleteAllWakeup Error: " + Log.getStackTraceString(e));
+        }
+    }
+
+    /**
+     * React method to delete (i.e. cancel a scheduled) notification.
+     */
+    @ReactMethod
     public void rDeleteAll(
         Callback errorCallback,
         Callback successCallback
     ) {
         try {
-            ArrayList<Integer> ids = mNotificationManager.getIDs();
+            ArrayList<String> ids = mNotificationManager.getIDs();
 
-            for (Integer id: ids) {
+            for (String id: ids) {
                 try {
                     mNotificationManager.delete(id);
                 } catch (Exception e) {
@@ -177,7 +274,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void rClear(
-        int notificationID,
+        String notificationID,
         Callback errorCallback,
         Callback successCallback
     ) {
@@ -251,7 +348,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
         Bundle extras = intent.getExtras();
 
         if (extras != null) {
-            Integer initialSysNotificationId = extras.getInt("initialSysNotificationId");
+            String initialSysNotificationId = extras.getString("initialSysNotificationId");
             if (initialSysNotificationId != null) {
                 cb.invoke(initialSysNotificationId, extras.getString("initialSysNotificationAction"), extras.getString("initialSysNotificationPayload"));
                 return;
@@ -281,6 +378,15 @@ public class NotificationModule extends ReactContextBaseJavaModule {
 
         return notificationAttributes;
     }
+    private WakeupAttributes getWakeupAttributesFromReadableMap(
+            ReadableMap readableMap
+    ) {
+        WakeupAttributes wakeupAttributes = new WakeupAttributes();
+
+        wakeupAttributes.loadFromReadableMap(readableMap);
+
+        return wakeupAttributes;
+    }
 
     private void listenNotificationEvent() {
         IntentFilter intentFilter = new IntentFilter("NotificationEvent");
@@ -292,7 +398,7 @@ public class NotificationModule extends ReactContextBaseJavaModule {
                 Bundle extras = intent.getExtras();
 
                 WritableMap params = Arguments.createMap();
-                params.putInt("notificationID", extras.getInt(NotificationEventReceiver.NOTIFICATION_ID));
+                params.putString("notificationID", extras.getString(NotificationEventReceiver.NOTIFICATION_ID));
                 params.putString("action", extras.getString(NotificationEventReceiver.ACTION));
                 params.putString("payload", extras.getString(NotificationEventReceiver.PAYLOAD));
 

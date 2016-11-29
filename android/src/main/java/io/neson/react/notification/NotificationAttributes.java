@@ -14,7 +14,7 @@ import java.util.Iterator;
 import com.google.gson.Gson;
 
 public class NotificationAttributes {
-    public Integer id;
+    public String id;
     public String subject;
     public String message;
     public String action;
@@ -129,7 +129,7 @@ public class NotificationAttributes {
     }
 
     public void loadFromReadableMap(ReadableMap readableMap) {
-        if (readableMap.hasKey("id")) id = readableMap.getInt("id");
+        if (readableMap.hasKey("id")) id = readableMap.getString("id");
         if (readableMap.hasKey("subject")) subject = readableMap.getString("subject");
         if (readableMap.hasKey("message")) message = readableMap.getString("message");
         if (readableMap.hasKey("action")) action = readableMap.getString("action");
@@ -201,7 +201,7 @@ public class NotificationAttributes {
     public ReadableMap asReadableMap() {
         WritableMap writableMap = new com.facebook.react.bridge.WritableNativeMap();
 
-        if (id != null) writableMap.putInt("id", id);
+        if (id != null) writableMap.putString("id", id);
         if (subject != null) writableMap.putString("subject", subject);
         if (message != null) writableMap.putString("message", message);
         if (action != null) writableMap.putString("action", action);

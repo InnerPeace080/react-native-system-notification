@@ -21,7 +21,7 @@ public class NotificationPublisher extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int id = intent.getIntExtra(NOTIFICATION_ID, 0);
+        String id = intent.getStringExtra(NOTIFICATION_ID);
         long currentTime = System.currentTimeMillis();
         Log.i("ReactSystemNotification", "NotificationPublisher: Prepare To Publish: " + id + ", Now Time: " + currentTime);
 

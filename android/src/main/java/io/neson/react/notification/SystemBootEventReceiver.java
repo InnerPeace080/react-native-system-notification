@@ -25,9 +25,9 @@ public class SystemBootEventReceiver extends BroadcastReceiver {
             NotificationManager notificationManager = new NotificationManager(context);
             SharedPreferences sharedPreferences = context.getSharedPreferences(NotificationManager.PREFERENCES_KEY, Context.MODE_PRIVATE);
 
-            ArrayList<Integer> ids = notificationManager.getIDs();
+            ArrayList<String> ids = notificationManager.getIDs();
 
-            for (Integer id: ids) {
+            for (String id: ids) {
                 try {
                     Notification notification = notificationManager.find(id);
 

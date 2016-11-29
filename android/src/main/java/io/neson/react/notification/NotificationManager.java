@@ -34,7 +34,7 @@ public class NotificationManager {
      * Create a notification.
      */
     public Notification create(
-        Integer notificationID,
+        String notificationID,
         NotificationAttributes notificationAttributes
     ) {
         Notification notification = new Notification(context, notificationID, notificationAttributes);
@@ -48,7 +48,7 @@ public class NotificationManager {
      * Create or update (if exists) a notification.
      */
     public Notification createOrUpdate(
-        Integer notificationID,
+        String notificationID,
         NotificationAttributes notificationAttributes
     ) {
         if (getIDs().contains(notificationID)) {
@@ -65,13 +65,13 @@ public class NotificationManager {
     /**
      * Get all notification ids.
      */
-    public ArrayList<Integer> getIDs() {
+    public ArrayList<String> getIDs() {
         Set<String> keys = sharedPreferences.getAll().keySet();
-        ArrayList<Integer> ids = new ArrayList<Integer>();
+        ArrayList<String> ids = new ArrayList<String>();
 
         for (String key : keys) {
             try {
-                ids.add(Integer.parseInt(key));
+                ids.add(key);
                 // TODO: Delete out-dated notifications BTW
             } catch (Exception e) {
                 Log.e("ReactSystemNotification", "NotificationManager: getIDs Error: " + Log.getStackTraceString(e));
@@ -84,7 +84,7 @@ public class NotificationManager {
     /**
      * Get a notification by its id.
      */
-    public Notification find(Integer notificationID) {
+    public Notification find(String notificationID) {
         Notification notification = new Notification(context, notificationID, null);
 
         if (notification.getAttributes() == null) notification.loadAttributesFromPreferences();
@@ -95,14 +95,14 @@ public class NotificationManager {
     /**
      * Delete a notification by its id.
      */
-    public Notification delete(Integer notificationID) {
+    public Notification delete(String notificationID) {
         return find(notificationID).delete();
     }
 
     /**
      * Clear a notification by its id.
      */
-    public Notification clear(Integer notificationID) {
+    public Notification clear(String notificationID) {
         return find(notificationID).clear();
     }
 

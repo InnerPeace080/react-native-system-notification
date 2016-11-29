@@ -7,6 +7,21 @@ var NotificationModule = require('react-native').NativeModules.NotificationModul
 
 // Warp the native module so we can do some pre/post processing to have a cleaner API.
 var Notification = {
+  createWakeup: function(attributes = {}) {
+    return new Promise(function(resolve, reject) {
+      NotificationModule.rGetApplicationName(function(e) {}, function(applicationName) {
+
+        // Set defaults
+        if (!attributes.subject) attributes.subject = applicationName;
+        attributes = encodeNativeNotification(attributes,false);
+
+        NotificationModule.createWakeup(attributes.id, attributes, reject, function(notification) {
+          resolve(decodeNativeNotification(notification,false));
+        });
+      });
+    });
+  },
+  
   create: function(attributes = {}) {
     return new Promise(function(resolve, reject) {
       NotificationModule.rGetApplicationName(function(e) {}, function(applicationName) {
@@ -43,7 +58,13 @@ var Notification = {
       });
     });
   },
-
+  
+  deleteAllWakeup: function() {
+    return new Promise(function(resolve, reject) {
+      NotificationModule.deleteAllWakeup(reject, resolve);
+    });
+  },
+  
   deleteAll: function() {
     return new Promise(function(resolve, reject) {
       NotificationModule.rDeleteAll(reject, resolve);
@@ -71,7 +92,7 @@ var Notification = {
         DeviceEventEmitter.addListener('sysNotificationClick', listener);
 
         NotificationModule.getInitialSysNotification(function(initialSysNotificationId,
-                                                              initialSysNotificationAction, 
+                                                              initialSysNotificationAction,
                                                               initialSysNotificationPayload) {
           if (initialSysNotificationId) {
             var event = {
@@ -80,20 +101,11 @@ var Notification = {
             }
 
             listener(event);
-            
+
             NotificationModule.removeInitialSysNotification();
           }
         });
-        
-        break;
-    }
-  },
 
-  removeAllListeners: function (type) {
-    switch (type) {
-      case 'press':
-      case 'click':
-        DeviceEventEmitter.removeAllListeners('sysNotificationClick');
         break;
     }
   },
@@ -104,26 +116,28 @@ var Notification = {
 module.exports = Notification;
 
 // Encode the JS notification to pass into the native model
-function encodeNativeNotification(attributes) {
+function encodeNativeNotification(attributes,isNotify=true) {
   if (typeof attributes === 'string') attributes = JSON.parse(attributes);
   // Set defaults
-  if (!attributes.smallIcon) attributes.smallIcon = 'ic_launcher';
-  if (!attributes.id) attributes.id = parseInt(Math.random() * 100000);
-  if (!attributes.action) attributes.action = 'DEFAULT';
+  if (!attributes.smallIcon && isNotify) attributes.smallIcon = 'ic_launcher';
+  if (!attributes.id) attributes.id = String.toString(parseInt(Math.random() * 100000));
+  if (!attributes.action && isNotify) attributes.action = 'DEFAULT';
   if (!attributes.payload) attributes.payload = {};
-  if (attributes.autoClear === undefined) attributes.autoClear = true;
-  if (attributes.tickerText === undefined) {
+  if (attributes.autoClear === undefined && isNotify) attributes.autoClear = true;
+  if (attributes.tickerText === undefined && isNotify) {
     if (attributes.subject) {
       attributes.tickerText = attributes.subject + ': ' + attributes.message;
     } else {
       attributes.tickerText = attributes.message;
     }
   }
-
-  if (attributes.priority === undefined) attributes.priority = 1;
-  if (attributes.sound === undefined) attributes.sound = 'default';
-  if (attributes.vibrate === undefined) attributes.vibrate = 'default';
-  if (attributes.lights === undefined) attributes.lights = 'default';
+  
+  if(isNotify){
+    if (attributes.priority === undefined) attributes.priority = 1;
+    if (attributes.sound === undefined) attributes.sound = 'default';
+    if (attributes.vibrate === undefined) attributes.vibrate = 'default';
+    if (attributes.lights === undefined) attributes.lights = 'default';
+  }
 
   attributes.delayed = (attributes.delay !== undefined);
   attributes.scheduled = (attributes.sendAt !== undefined);
@@ -216,7 +230,7 @@ function encodeNativeNotification(attributes) {
 }
 
 // Decode the notification data from the native module to pass into JS
-function decodeNativeNotification(attributes) {
+function decodeNativeNotification(attributes,isNotify=true) {
   // Convert dates back to date object
   if (attributes.sendAt) attributes.sendAt = new Date(parseInt(attributes.sendAt));
   if (attributes.endAt) attributes.endAt = new Date(parseInt(attributes.endAt));
@@ -226,7 +240,7 @@ function decodeNativeNotification(attributes) {
   if (parseInt(attributes.repeatEvery).toString() === attributes.repeatEvery) attributes.repeatEvery = parseInt(attributes.repeatEvery);
 
   // Convert integer into float
-  if (attributes.progress) attributes.progress = attributes.progress / 1000;
+  if (attributes.progress && isNotify) attributes.progress = attributes.progress / 1000;
 
   // Parse the payload
   if (attributes.payload) attributes.payload = JSON.parse(attributes.payload);
