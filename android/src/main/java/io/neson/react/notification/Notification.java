@@ -2,6 +2,7 @@ package io.neson.react.notification;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.SystemClock;
 import android.app.PendingIntent;
@@ -174,6 +175,8 @@ public class Notification {
             int defaults = 0;
             if ("default".equals(attributes.sound)) {
                 defaults = defaults | android.app.Notification.DEFAULT_SOUND;
+            }else if("default_rington".equals(attributes.sound)){
+                attributes.sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE).toString();
             }
             if ("default".equals(attributes.vibrate)) {
                 defaults = defaults | android.app.Notification.DEFAULT_VIBRATE;
